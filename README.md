@@ -82,36 +82,22 @@
 
 ## 🏗️ Architecture
 
-```
-                    ┌─────────────────────────┐
-                    │    Streamlit Dashboard   │
-                    │    (Web Interface)       │
-                    └────────────┬────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │   Platform Router        │
-                    │ Instagram│Facebook│YouTube│
-                    └────┬──────┬──────┬──────┘
-                         │      │      │
-              ┌──────────▼┐  ┌─▼──────▼──────────┐
-              │Supermetrics│  │  YouTube Data API  │
-              │  API       │  │       v3           │
-              └──────┬─────┘  └────────┬───────────┘
-                     │                 │
-              ┌──────▼─────────────────▼───────┐
-              │     Data Processing Engine      │
-              │  • Chunked fetching             │
-              │  • Metric computation           │
-              │  • Engagement normalization     │
-              │  • Date filtering & aggregation │
-              └──────────────┬─────────────────┘
-                             │
-              ┌──────────────▼─────────────────┐
-              │     Google Sheets API v4        │
-              │  • Read profile/page lists      │
-              │  • Write raw data sheets        │
-              │  • Write aggregated reports     │
-              └────────────────────────────────┘
+```mermaid
+flowchart TB
+    SD["🖥️ Streamlit Dashboard\n(Web Interface)"]
+    PR["🔀 Platform Router\nInstagram · Facebook · YouTube"]
+
+    SM["Supermetrics API\n(IG + FB)"]
+    YT["YouTube Data API v3"]
+
+    DP["⚙️ Data Processing Engine\nChunked fetching · Metric computation\nEngagement normalization · Date filtering"]
+
+    GS["📊 Google Sheets API v4\nRead profiles · Write raw data\nWrite aggregated reports"]
+
+    SD --> PR
+    PR --> SM & YT
+    SM & YT --> DP
+    DP --> GS
 ```
 
 ---
@@ -152,12 +138,12 @@
 
 ## 🔄 Data Pipeline Flow
 
-```
-1️⃣  INPUT         →  Google Sheets (Profile/Page URLs, metadata)
-2️⃣  EXTRACTION    →  Supermetrics API / YouTube API (raw social data)
-3️⃣  PROCESSING    →  Date filtering, metric computation, engagement calc
-4️⃣  AGGREGATION   →  Group-by-profile summaries, per-post averages
-5️⃣  OUTPUT        →  Google Sheets (raw_data + agg_data worksheets)
+```mermaid
+flowchart LR
+    A["1️⃣ INPUT\nGoogle Sheets\n(Profile/Page URLs)"] --> B["2️⃣ EXTRACTION\nSupermetrics API\nYouTube API"]
+    B --> C["3️⃣ PROCESSING\nDate filtering\nMetric computation"]
+    C --> D["4️⃣ AGGREGATION\nGroup-by-profile\nPer-post averages"]
+    D --> E["5️⃣ OUTPUT\nGoogle Sheets\n(raw + agg data)"]
 ```
 
 ---
